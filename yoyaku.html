@@ -11,13 +11,13 @@
 
   // ↓↓↓ この部分をご自身のfirebaseConfigに置き換えてください ↓↓↓
   const firebaseConfig = {
-  apiKey: "AIzaSyAm2XlXTuDiRSq6D2lNbneNYSz1OZQy35E",
-  authDomain: "okonomiyaki-yoyaku.firebaseapp.com",
-  databaseURL: "https://okonomiyaki-yoyaku-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "okonomiyaki-yoyaku",
-  storageBucket: "okonomiyaki-yoyaku.firebasestorage.app",
-  messagingSenderId: "877238058123",
-  appId: "1:877238058123:web:3aef892ad1d0786355288e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ↑↑↑ ここまで ↑↑↑
 
@@ -888,6 +888,12 @@ async function saveEdit() {
   } catch(e) { alert('更新に失敗しました。'); }
 }
 
+function fmtDate(ds) {
+  if (!ds) return '';
+  const [y,m,d] = ds.split('-');
+  return `${y}年${parseInt(m)}月${parseInt(d)}日`;
+}
+
 function cardHTML(r) {
   const isCancelled = r.cancelled === true;
   const genderTag = r.gender && r.gender !== '未回答' ? `（${r.gender}）` : '';
@@ -897,7 +903,7 @@ function cardHTML(r) {
   if (r.adult) gs.push(`大人${r.adult}名`);
   if (r.child) gs.push(`子ども${r.child}名`);
   const guestStr = gs.length ? `　内訳：${gs.join('・')}` : '';
-  const staffStr = [r.staff ? `担当：${r.staff}` : '', r.received ? `受付：${r.received}` : ''].filter(Boolean).join(' ／ ');
+  const staffStr = [r.staff ? `担当：${r.staff}` : '', r.received ? `受付：${fmtDate(r.received)}` : ''].filter(Boolean).join(' ／ ');
 
   const detailLines = [];
   if (telStr) detailLines.push(telStr);
@@ -907,23 +913,20 @@ function cardHTML(r) {
   const btns = isCancelled
     ? `<button class="restore-btn" onclick="restoreReservation('${r.id}')">元に戻す</button>
        <button class="delete-btn"  onclick="deleteReservation('${r.id}')">削除</button>`
-    : `<button class="edit-btn"    onclick="openEdit('${r.id}')">編集</button>
-       <button class="cancel-btn"  onclick="cancelReservation('${r.id}')">キャンセル</button>
-       <button class="delete-btn"  onclick="deleteReservation('${r.id}')">削除</button>`;
+    : `<button class="edit-btn"   onclick="openEdit('${r.id}')">編集</button>
+       <button class="cancel-btn" onclick="cancelReservation('${r.id}')">キャンセル</button>
+       <button class="delete-btn" onclick="deleteReservation('${r.id}')">削除</button>`;
 
   return `<div class="reserve-card${isCancelled ? ' cancelled' : ''}">
-    <div class="reserve-top">
-      <div class="reserve-main">
-        <div class="reserve-name${isCancelled ? ' cancelled' : ''}">${r.name}様${genderTag}${isCancelled ? '<span class="cancel-badge">キャンセル</span>' : ''}</div>
-        <div class="reserve-detail">${detailLines.join('<br>')}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-        <div class="reserve-time${isCancelled ? ' cancelled' : ''}">${r.visitTime}</div>
-        <div class="card-btns">${btns}</div>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px">
+      <div class="reserve-name${isCancelled ? ' cancelled' : ''}">${r.name}様${genderTag}${isCancelled ? '<span class="cancel-badge">キャンセル</span>' : ''}</div>
+      <div class="reserve-time${isCancelled ? ' cancelled' : ''}" style="flex-shrink:0">${r.visitTime}</div>
     </div>
+    <div class="reserve-detail">${detailLines.join('<br>')}</div>
     ${r.note ? `<div class="reserve-note">📝 ${r.note}</div>` : ''}
+    <div class="card-btns" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-light)">${btns}</div>
   </div>`;
+}
 }
 
 async function cancelReservation(id) {
