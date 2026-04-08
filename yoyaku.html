@@ -11,13 +11,13 @@
 
   // ↓↓↓ この部分をご自身のfirebaseConfigに置き換えてください ↓↓↓
   const firebaseConfig = {
-  apiKey: "AIzaSyAm2XlXTuDiRSq6D2lNbneNYSz1OZQy35E",
-  authDomain: "okonomiyaki-yoyaku.firebaseapp.com",
-  databaseURL: "https://okonomiyaki-yoyaku-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "okonomiyaki-yoyaku",
-  storageBucket: "okonomiyaki-yoyaku.firebasestorage.app",
-  messagingSenderId: "877238058123",
-  appId: "1:877238058123:web:3aef892ad1d0786355288e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ↑↑↑ ここまで ↑↑↑
 
@@ -423,7 +423,10 @@ body {
 
       <div class="form-group">
         <label>お名前</label>
-        <input type="text" id="f-name" placeholder="例：山田" />
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="text" id="f-name" placeholder="例：山田" style="max-width:160px" />
+          <span style="font-size:15px;color:var(--text-muted)">様</span>
+        </div>
       </div>
       <div class="form-group">
         <label>性別</label>
@@ -489,8 +492,7 @@ body {
       </div>
       <span class="badge" id="cal-badge"></span>
     </div>
-    <div class="big-cal-grid" id="cal-daynames"></div>
-    <div class="big-cal-grid" id="cal-body" style="margin-top:3px"></div>
+    <div class="big-cal-grid" id="cal-wrapper"></div>
     <div id="cal-detail"></div>
   </div>
 
@@ -527,7 +529,10 @@ body {
 
       <div class="form-group">
         <label>お名前</label>
-        <input type="text" id="e-name" placeholder="例：山田" />
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="text" id="e-name" placeholder="例：山田" style="max-width:160px" />
+          <span style="font-size:15px;color:var(--text-muted)">様</span>
+        </div>
       </div>
       <div class="form-group">
         <label>性別</label>
@@ -885,18 +890,24 @@ function renderCal() {
   const mStr     = `${y}-${String(m+1).padStart(2,'0')}`;
   const monthRvs = reservations.filter(r => r.visitDate.startsWith(mStr));
   document.getElementById('cal-badge').textContent = `${monthRvs.length}件`;
-  document.getElementById('cal-daynames').innerHTML = DAY_NAMES.map((d,i) =>
-    `<div class="big-dayname" style="color:${i===0?'#c0392b':i===6?'#2980b9':''}">${d}</div>`
-  ).join('');
+  const wrapper = document.getElementById('cal-wrapper');
+  wrapper.innerHTML = '';
+  // 曜日ヘッダー
+  DAY_NAMES.forEach((d,i) => {
+    const dn = document.createElement('div');
+    dn.className = 'big-dayname';
+    dn.style.color = i===0?'#c0392b':i===6?'#2980b9':'';
+    dn.textContent = d;
+    wrapper.appendChild(dn);
+  });
   const first = new Date(y, m, 1).getDay();
   const days  = new Date(y, m+1, 0).getDate();
   const today = new Date();
-  const body  = document.getElementById('cal-body');
-  body.innerHTML = '';
+  // 空白セル
   for (let i = 0; i < first; i++) {
     const cell = document.createElement('div');
     cell.className = 'big-cell other-month';
-    body.appendChild(cell);
+    wrapper.appendChild(cell);
   }
   for (let d = 1; d <= days; d++) {
     const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -907,13 +918,13 @@ function renderCal() {
     const dots   = dayRvs.map(r => `<div class="big-dot">${r.visitTime} ${r.name}</div>`).join('');
     cell.innerHTML = `<div class="big-date">${d}</div><div class="big-dots">${dots}</div>`;
     cell.onclick = () => showDayDetail(ds);
-    body.appendChild(cell);
+    wrapper.appendChild(cell);
   }
   const rem = (7-((first+days)%7))%7;
   for (let d = 1; d <= rem; d++) {
     const cell = document.createElement('div');
     cell.className = 'big-cell other-month';
-    body.appendChild(cell);
+    wrapper.appendChild(cell);
   }
 }
 
