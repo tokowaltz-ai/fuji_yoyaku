@@ -11,13 +11,13 @@
 
   // ↓↓↓ この部分をご自身のfirebaseConfigに置き換えてください ↓↓↓
   const firebaseConfig = {
-  apiKey: "AIzaSyAm2XlXTuDiRSq6D2lNbneNYSz1OZQy35E",
-  authDomain: "okonomiyaki-yoyaku.firebaseapp.com",
-  databaseURL: "https://okonomiyaki-yoyaku-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "okonomiyaki-yoyaku",
-  storageBucket: "okonomiyaki-yoyaku.firebasestorage.app",
-  messagingSenderId: "877238058123",
-  appId: "1:877238058123:web:3aef892ad1d0786355288e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ↑↑↑ ここまで ↑↑↑
 
@@ -916,16 +916,17 @@ function renderCal() {
 
 function showDayDetail(ds) {
   const [y,m,d] = ds.split('-');
+  const dow = ['日','月','火','水','木','金','土'][new Date(parseInt(y), parseInt(m)-1, parseInt(d)).getDay()];
   const dayRvs  = reservations.filter(r => r.visitDate === ds)
     .sort((a,b) => a.visitTime.localeCompare(b.visitTime));
   const container = document.getElementById('cal-detail');
   container.dataset.date = ds;
   if (!dayRvs.length) {
-    container.innerHTML = `<div class="empty-msg">${parseInt(m)}月${parseInt(d)}日の予約はありません</div>`;
+    container.innerHTML = `<div class="empty-msg">${parseInt(m)}月${parseInt(d)}日（${dow}）の予約はありません</div>`;
     return;
   }
   container.innerHTML =
-    `<div class="day-detail-header">${parseInt(y)}年${parseInt(m)}月${parseInt(d)}日の予約 ${dayRvs.length}件</div>` +
+    `<div class="day-detail-header">${parseInt(y)}年${parseInt(m)}月${parseInt(d)}日（${dow}）の予約 ${dayRvs.length}件</div>` +
     dayRvs.map(r => cardHTML(r)).join('');
 }
 
