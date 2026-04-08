@@ -11,13 +11,13 @@
 
   // ↓↓↓ この部分をご自身のfirebaseConfigに置き換えてください ↓↓↓
   const firebaseConfig = {
-  apiKey: "AIzaSyAm2XlXTuDiRSq6D2lNbneNYSz1OZQy35E",
-  authDomain: "okonomiyaki-yoyaku.firebaseapp.com",
-  databaseURL: "https://okonomiyaki-yoyaku-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "okonomiyaki-yoyaku",
-  storageBucket: "okonomiyaki-yoyaku.firebasestorage.app",
-  messagingSenderId: "877238058123",
-  appId: "1:877238058123:web:3aef892ad1d0786355288e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ↑↑↑ ここまで ↑↑↑
 
@@ -282,26 +282,40 @@ body {
   display: flex; justify-content: space-between;
   align-items: flex-start; gap: 10px;
 }
-.reserve-name { font-size: 15px; font-weight: 600; }
+.reserve-name { font-size: 16px; font-weight: 600; }
+.reserve-name.cancelled { text-decoration: line-through; color: var(--text-muted); }
 .reserve-people {
-  font-size: 12px; color: var(--text-muted);
-  font-weight: 400; margin-left: 4px;
+  font-size: 14px; color: var(--text);
+  font-weight: 500; display: block; margin-top: 2px;
 }
 .reserve-detail {
-  font-size: 12px; color: var(--text-muted);
-  margin-top: 4px; line-height: 1.8;
+  font-size: 14px; color: var(--text);
+  margin-top: 6px; line-height: 2;
 }
 .reserve-time {
   font-size: 15px; font-weight: 700;
   color: var(--accent); white-space: nowrap;
 }
+.reserve-time.cancelled { color: var(--text-muted); text-decoration: line-through; }
 .reserve-note {
-  font-size: 12px; color: var(--text-muted);
+  font-size: 13px; color: var(--text-muted);
   margin-top: 8px; padding-top: 8px;
   border-top: 1px solid var(--border-light);
   font-style: italic;
 }
-.card-btns { display: flex; gap: 6px; margin-top: 4px; }
+.reserve-card.cancelled {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+  opacity: .75;
+}
+.cancel-badge {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  background: #fcebeb; color: #a32d2d;
+  border: 1px solid #f7c1c1;
+  border-radius: 4px; padding: 1px 8px;
+  margin-left: 8px; vertical-align: middle;
+}
+.card-btns { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
 .edit-btn {
   padding: 4px 10px;
   border: 1px solid var(--accent);
@@ -311,6 +325,24 @@ body {
   font-family: inherit; white-space: nowrap;
 }
 .edit-btn:hover { background: var(--accent-light); }
+.cancel-btn {
+  padding: 4px 10px;
+  border: 1px solid #e24b4a;
+  border-radius: var(--radius-sm);
+  background: none; color: #e24b4a;
+  font-size: 11px; cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.cancel-btn:hover { background: #fcebeb; }
+.restore-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: none; color: var(--text-muted);
+  font-size: 11px; cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.restore-btn:hover { background: var(--bg-secondary); }
 .delete-btn {
   padding: 4px 10px;
   border: 1px solid var(--border);
@@ -857,31 +889,53 @@ async function saveEdit() {
 }
 
 function cardHTML(r) {
-  const genderTag = r.gender && r.gender !== '未回答' ? ` ・ ${r.gender}` : '';
-  const telStr    = r.tel    ? `📞 ${r.tel}<br>` : '';
+  const isCancelled = r.cancelled === true;
+  const genderTag = r.gender && r.gender !== '未回答' ? `（${r.gender}）` : '';
+  const telStr    = r.tel ? `📞 ${r.tel}` : '';
   const peopleStr = r.people ? `${r.people}名` : '';
   const gs = [];
   if (r.adult) gs.push(`大人${r.adult}名`);
   if (r.child) gs.push(`子ども${r.child}名`);
-  const guestStr  = gs.length ? `内訳：${gs.join('・')}<br>` : '';
-  const staffParts = [r.staff ? `担当：${r.staff}` : '', r.received ? `受付：${r.received}` : ''].filter(Boolean);
-  const staffStr  = staffParts.join(' ／ ');
-  return `<div class="reserve-card">
+  const guestStr = gs.length ? `　内訳：${gs.join('・')}` : '';
+  const staffStr = [r.staff ? `担当：${r.staff}` : '', r.received ? `受付：${r.received}` : ''].filter(Boolean).join(' ／ ');
+
+  const detailLines = [];
+  if (telStr) detailLines.push(telStr);
+  if (peopleStr || guestStr) detailLines.push(peopleStr + guestStr);
+  if (staffStr) detailLines.push(staffStr);
+
+  const btns = isCancelled
+    ? `<button class="restore-btn" onclick="restoreReservation('${r.id}')">元に戻す</button>
+       <button class="delete-btn"  onclick="deleteReservation('${r.id}')">削除</button>`
+    : `<button class="edit-btn"    onclick="openEdit('${r.id}')">編集</button>
+       <button class="cancel-btn"  onclick="cancelReservation('${r.id}')">キャンセル</button>
+       <button class="delete-btn"  onclick="deleteReservation('${r.id}')">削除</button>`;
+
+  return `<div class="reserve-card${isCancelled ? ' cancelled' : ''}">
     <div class="reserve-top">
       <div class="reserve-main">
-        <div class="reserve-name">${r.name}様${genderTag}<span class="reserve-people">${peopleStr}</span></div>
-        <div class="reserve-detail">${telStr}${guestStr}${staffStr}</div>
+        <div class="reserve-name${isCancelled ? ' cancelled' : ''}">${r.name}様${genderTag}${isCancelled ? '<span class="cancel-badge">キャンセル</span>' : ''}</div>
+        <div class="reserve-detail">${detailLines.join('<br>')}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-        <div class="reserve-time">${r.visitTime}</div>
-        <div class="card-btns">
-          <button class="edit-btn"   onclick="openEdit('${r.id}')">編集</button>
-          <button class="delete-btn" onclick="deleteReservation('${r.id}')">削除</button>
-        </div>
+        <div class="reserve-time${isCancelled ? ' cancelled' : ''}">${r.visitTime}</div>
+        <div class="card-btns">${btns}</div>
       </div>
     </div>
     ${r.note ? `<div class="reserve-note">📝 ${r.note}</div>` : ''}
   </div>`;
+}
+
+async function cancelReservation(id) {
+  if (!confirm('この予約をキャンセルにしますか？\n（データは残ります）')) return;
+  try { await window._fbUpdate(id, { cancelled: true }); }
+  catch(e) { alert('更新に失敗しました。'); }
+}
+
+async function restoreReservation(id) {
+  if (!confirm('キャンセルを取り消して予約を復活させますか？')) return;
+  try { await window._fbUpdate(id, { cancelled: false }); }
+  catch(e) { alert('更新に失敗しました。'); }
 }
 
 function renderCal() {
@@ -915,7 +969,7 @@ function renderCal() {
     const cell = document.createElement('div');
     cell.className = 'big-cell' + (isToday ? ' today-cell' : '');
     const dayRvs = reservations.filter(r => r.visitDate === ds);
-    const dots   = dayRvs.map(r => `<div class="big-dot">${r.visitTime} ${r.name}</div>`).join('');
+    const dots   = dayRvs.map(r => `<div class="big-dot" style="${r.cancelled?'opacity:.45;text-decoration:line-through':''}">${r.visitTime} ${r.name}</div>`).join('');
     cell.innerHTML = `<div class="big-date">${d}</div><div class="big-dots">${dots}</div>`;
     cell.onclick = () => showDayDetail(ds);
     wrapper.appendChild(cell);
