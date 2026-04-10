@@ -11,13 +11,13 @@
 
   // ↓↓↓ この部分をご自身のfirebaseConfigに置き換えてください ↓↓↓
   const firebaseConfig = {
-  apiKey: "AIzaSyAm2XlXTuDiRSq6D2lNbneNYSz1OZQy35E",
-  authDomain: "okonomiyaki-yoyaku.firebaseapp.com",
-  databaseURL: "https://okonomiyaki-yoyaku-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "okonomiyaki-yoyaku",
-  storageBucket: "okonomiyaki-yoyaku.firebasestorage.app",
-  messagingSenderId: "877238058123",
-  appId: "1:877238058123:web:3aef892ad1d0786355288e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ↑↑↑ ここまで ↑↑↑
 
@@ -116,6 +116,7 @@ body {
   color: var(--text-muted); letter-spacing: .04em;
 }
 .form-group input,
+.form-group select,
 .form-group textarea {
   padding: 9px 12px;
   border: 1px solid var(--border);
@@ -127,6 +128,7 @@ body {
   transition: border-color .15s, box-shadow .15s;
 }
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: var(--accent);
@@ -507,7 +509,12 @@ body {
       </div>
       <div class="form-group">
         <label>受付担当者名</label>
-        <input type="text" id="f-staff" placeholder="例：田中" />
+        <select id="f-staff">
+          <option value="">選択してください</option>
+          <option value="寿子">寿子</option>
+          <option value="聡子">聡子</option>
+          <option value="榮子">榮子</option>
+        </select>
       </div>
 
     </div>
@@ -613,7 +620,12 @@ body {
       </div>
       <div class="form-group">
         <label>受付担当者名</label>
-        <input type="text" id="e-staff" placeholder="例：田中" />
+        <select id="e-staff">
+          <option value="">選択してください</option>
+          <option value="寿子">寿子</option>
+          <option value="聡子">聡子</option>
+          <option value="榮子">榮子</option>
+        </select>
       </div>
 
     </div>
