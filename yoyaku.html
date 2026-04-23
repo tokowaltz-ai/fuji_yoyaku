@@ -11,13 +11,13 @@
 
   // ↓↓↓ この部分をご自身のfirebaseConfigに置き換えてください ↓↓↓
   const firebaseConfig = {
-  apiKey: "AIzaSyAm2XlXTuDiRSq6D2lNbneNYSz1OZQy35E",
-  authDomain: "okonomiyaki-yoyaku.firebaseapp.com",
-  databaseURL: "https://okonomiyaki-yoyaku-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "okonomiyaki-yoyaku",
-  storageBucket: "okonomiyaki-yoyaku.firebasestorage.app",
-  messagingSenderId: "877238058123",
-  appId: "1:877238058123:web:3aef892ad1d0786355288e"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   // ↑↑↑ ここまで ↑↑↑
 
@@ -104,7 +104,7 @@ body {
 }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-.main { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
+.main { max-width: 800px; margin: 0 auto; padding: 12px 8px; }
 
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media(max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
@@ -226,7 +226,7 @@ body {
 
 .big-cal-header {
   display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 14px;
+  justify-content: space-between; margin-bottom: 8px;
 }
 .big-cal-nav { display: flex; gap: 8px; align-items: center; }
 .big-cal-nav button {
@@ -238,13 +238,13 @@ body {
 }
 .big-cal-nav button:hover { background: var(--bg-secondary); }
 .big-cal-title { font-size: 20px; font-weight: 600; }
-.big-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.big-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
 .big-dayname {
-  text-align: center; font-size: 14px;
-  font-weight: 600; color: var(--text-muted); padding: 6px 0;
+  text-align: center; font-size: clamp(9px, 2.2vw, 14px);
+  font-weight: 600; color: var(--text-muted); padding: 3px 0;
 }
 .big-cell {
-  min-height: 80px; padding: 6px;
+  min-height: 0; padding: 3px;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   cursor: pointer; background: var(--bg-card);
@@ -254,17 +254,17 @@ body {
 .big-cell.other-month { opacity: .3; background: transparent; cursor: default; }
 .big-cell.today-cell { border-color: var(--accent); }
 .big-date {
-  font-size: 15px; font-weight: 600;
-  width: 27px; height: 27px;
+  font-size: clamp(9px, 2.2vw, 15px); font-weight: 600;
+  width: clamp(18px, 4vw, 27px); height: clamp(18px, 4vw, 27px);
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
 }
 .big-cell.today-cell .big-date { background: var(--accent); color: white; }
 .big-dots { display: flex; flex-direction: column; gap: 2px; margin-top: 3px; }
 .big-dot {
-  font-size: 11px;
+  font-size: clamp(7px, 1.6vw, 11px);
   background: var(--accent-light); color: var(--accent-dark);
-  border-radius: 3px; padding: 2px 4px;
+  border-radius: 3px; padding: 1px 3px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
@@ -1175,7 +1175,7 @@ function renderCal() {
     const cell = document.createElement('div');
     cell.className = 'big-cell' + (isToday ? ' today-cell' : '');
     const dayRvs = reservations.filter(r => r.visitDate === ds);
-    const dots   = dayRvs.map(r => `<div class="big-dot" style="${r.cancelled?'opacity:.45;text-decoration:line-through':''}">${r.visitTime}${r.people?' '+r.people+'名':''} ${r.name}</div>`).join('');
+    const dots   = dayRvs.map(r => `<div class="big-dot" style="${r.cancelled?'opacity:.45;text-decoration:line-through':''}">${r.visitTime}${r.people?' '+r.people+'名':''}</div>`).join('');
     cell.innerHTML = `<div class="big-date">${d}</div><div class="big-dots">${dots}</div>`;
     cell.onclick = () => showDayDetail(ds);
     wrapper.appendChild(cell);
